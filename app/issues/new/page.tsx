@@ -10,6 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import SimpleMDE from "react-simplemde-editor";
+import ErrorMessage from "@/app/components/ErrorMessage";
 
 type IssueForm = z.infer<typeof createIssueSchema>;
 
@@ -48,12 +49,7 @@ const NewIssuePage = () => {
         <TextField.Root>
           <TextField.Input placeholder="Title" {...register("title")} />
         </TextField.Root>
-
-        {errors.title && (
-          <Text color="red" as="p">
-            {errors.title?.message}
-          </Text>
-        )}
+        <ErrorMessage>{errors.title?.message}</ErrorMessage>
 
         <Controller
           name="description"
@@ -62,12 +58,8 @@ const NewIssuePage = () => {
             <SimpleMDE placeholder="Description" {...field} />
           )}
         />
+        <ErrorMessage>{errors.description?.message}</ErrorMessage>
 
-        {errors.description && (
-          <Text color="red" as="p">
-            {errors.description?.message}
-          </Text>
-        )}
         <Button>Create New Issue</Button>
       </form>
     </div>
