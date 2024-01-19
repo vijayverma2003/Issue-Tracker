@@ -13,7 +13,7 @@ const IssuesPage = async () => {
   return (
     <div>
       <IssueActions />
-      <Table.Root variant="surface" className="max-w-5xl">
+      <Table.Root variant="surface">
         <Table.Header>
           <Table.Row>
             <Table.ColumnHeaderCell>Issue</Table.ColumnHeaderCell>
