@@ -1,6 +1,6 @@
 import { issueSchema } from "@/app/validationSchemas";
-import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   request: NextRequest,
@@ -44,5 +44,5 @@ export async function DELETE(
 
   await prisma.issue.delete({ where: { id: issue.id } });
 
-  return NextResponse.json({})
+  return NextResponse.json({});
 }
