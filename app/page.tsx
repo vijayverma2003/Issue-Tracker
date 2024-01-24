@@ -1,3 +1,4 @@
+import LatestIssues from "./LatestIssues";
 import Pagination from "./components/Pagination";
 
 export default function Home({
@@ -5,5 +6,5 @@ export default function Home({
 }: {
   searchParams: { page: string };
 }) {
-  return <div>Hello World</div>;
+  return <LatestIssues />;
 }
