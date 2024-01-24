@@ -6,12 +6,14 @@ import NextLink from "next/link";
 import { PiArrowDown, PiArrowUp } from "react-icons/pi";
 import Link from "../../components/Link";
 import IssueActions from "./IssueActions";
+import Pagination from "@/app/components/Pagination";
 
 interface Props {
   searchParams: {
     status: Status;
     orderBy: keyof Issue;
     sortOrder: "asc" | "desc";
+    page: string;
   };
 }
 
@@ -31,6 +33,8 @@ const IssuesPage = async ({ searchParams }: Props) => {
     ? searchParams.status
     : undefined;
 
+  const where = { status };
+
   const orderBy = columns.map((col) => col.value).includes(searchParams.orderBy)
     ? {
         [searchParams.orderBy]:
@@ -40,10 +44,17 @@ const IssuesPage = async ({ searchParams }: Props) => {
       }
     : undefined;
 
+  const page = parseInt(searchParams.page) || 1;
+  const pageSize = 10;
+
   const issues = await prisma.issue.findMany({
-    where: { status },
+    where,
     orderBy,
+    skip: (page - 1) * pageSize,
+    take: pageSize,
   });
+
+  const issuesCount = await prisma.issue.count({ where });
 
   return (
     <div>
@@ -102,6 +113,11 @@ const IssuesPage = async ({ searchParams }: Props) => {
           ))}
         </Table.Body>
       </Table.Root>
+      <Pagination
+        pageSize={pageSize}
+        currentPage={page}
+        itemsCount={issuesCount}
+      />
     </div>
   );
 };
