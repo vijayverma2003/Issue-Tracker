@@ -5,14 +5,5 @@ export default function Home({
 }: {
   searchParams: { page: string };
 }) {
-  return (
-    <div>
-      Hello World
-      <Pagination
-        pageSize={10}
-        itemsCount={100}
-        currentPage={parseInt(searchParams.page)}
-      />
-    </div>
-  );
+  return <div>Hello World</div>;
 }

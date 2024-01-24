@@ -1,33 +1,15 @@
-import { IssueStatusBadge } from "@/app/components";
-import prisma from "@/prisma/client";
-import { Issue, Status } from "@prisma/client";
-import { Table } from "@radix-ui/themes";
-import NextLink from "next/link";
-import { PiArrowDown, PiArrowUp } from "react-icons/pi";
-import Link from "../../components/Link";
-import IssueActions from "./IssueActions";
 import Pagination from "@/app/components/Pagination";
+import prisma from "@/prisma/client";
+import { Status } from "@prisma/client";
+import IssueActions from "./IssueActions";
+import IssuesTable, { IssueQuery, columnNames } from "./IssuesTable";
+import { Flex } from "@radix-ui/themes";
 
 interface Props {
-  searchParams: {
-    status: Status;
-    orderBy: keyof Issue;
-    sortOrder: "asc" | "desc";
-    page: string;
-  };
+  searchParams: IssueQuery;
 }
 
 const IssuesPage = async ({ searchParams }: Props) => {
-  const columns: { label: string; value: keyof Issue; className?: string }[] = [
-    { label: "Issue", value: "title" },
-    { label: "Status", value: "status", className: "hidden md:table-cell" },
-    {
-      label: "Created At",
-      value: "createdAt",
-      className: "hidden md:table-cell",
-    },
-  ];
-
   const statuses = Object.values(Status);
   const status = statuses.includes(searchParams.status)
     ? searchParams.status
@@ -35,7 +17,7 @@ const IssuesPage = async ({ searchParams }: Props) => {
 
   const where = { status };
 
-  const orderBy = columns.map((col) => col.value).includes(searchParams.orderBy)
+  const orderBy = columnNames.includes(searchParams.orderBy)
     ? {
         [searchParams.orderBy]:
           searchParams.sortOrder === "asc" || searchParams.sortOrder === "desc"
@@ -57,68 +39,15 @@ const IssuesPage = async ({ searchParams }: Props) => {
   const issuesCount = await prisma.issue.count({ where });
 
   return (
-    <div>
+    <Flex direction="column" gap="4">
       <IssueActions />
-      <Table.Root variant="surface">
-        <Table.Header>
-          <Table.Row>
-            {columns.map((column) => (
-              <Table.ColumnHeaderCell
-                className={column.className}
-                key={column.value}
-              >
-                <NextLink
-                  href={{
-                    query: {
-                      ...searchParams,
-                      orderBy: column.value,
-                      sortOrder:
-                        (searchParams.orderBy === column.value &&
-                        searchParams.sortOrder === "asc"
-                          ? "desc"
-                          : "asc") || "asc",
-                    },
-                  }}
-                >
-                  {column.label}
-                </NextLink>
-                {column.value === searchParams.orderBy &&
-                  searchParams.sortOrder === "asc" && (
-                    <PiArrowUp className="inline" />
-                  )}
-                {column.value === searchParams.orderBy &&
-                  searchParams.sortOrder === "desc" && (
-                    <PiArrowDown className="inline" />
-                  )}
-              </Table.ColumnHeaderCell>
-            ))}
-          </Table.Row>
-        </Table.Header>
-        <Table.Body>
-          {issues?.map((issue) => (
-            <Table.Row key={issue.id}>
-              <Table.Cell>
-                <Link href={`/issues/${issue.id}`}>{issue.title}</Link>
-                <div className="block md:hidden mt-1">
-                  <IssueStatusBadge status={issue.status} />
-                </div>
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                <IssueStatusBadge status={issue.status} />
-              </Table.Cell>
-              <Table.Cell className="hidden md:table-cell">
-                {issue.createdAt.toLocaleString()}
-              </Table.Cell>
-            </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
+      <IssuesTable searchParams={searchParams} issues={issues} />
       <Pagination
         pageSize={pageSize}
         currentPage={page}
         itemsCount={issuesCount}
       />
-    </div>
+    </Flex>
   );
 };
 
